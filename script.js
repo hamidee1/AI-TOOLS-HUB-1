@@ -1,7 +1,7 @@
 document.addEventListener('DOMContentLoaded', () => {
     // --- STATE & CONFIG ---
     let state = {
-        language: localStorage.getItem('language') || 'ar', // Default to Arabic as per screenshot
+        language: localStorage.getItem('language') || 'ar', // Default to Arabic
         theme: 'dark', // Force dark mode
         currentPage: 'home', // 'home', 'categories', 'rankedList'
         currentCategory: null,
@@ -42,7 +42,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     </button>
                 </div>
             </div>`;
-        headerEl.style.display = 'none'; // Hide header on home page
+        headerEl.style.display = 'none';
         footerEl.style.display = 'none';
         document.getElementById('search-btn').addEventListener('click', () => navigateTo('categories'));
     };
@@ -86,22 +86,22 @@ document.addEventListener('DOMContentLoaded', () => {
         footerEl.style.display = 'block';
         document.getElementById('back-to-categories-btn').addEventListener('click', () => navigateTo('categories'));
     };
-
-    // --- COMPONENT RENDER FUNCTIONS ---
     
     const renderToolCard = (tool, rank) => {
         const lang = state.language;
+        const short_description = (tool.short_description && tool.short_description[lang]) ? tool.short_description[lang] : (categories.find(c => c.id === tool.category)?.name[lang] || 'AI Tool');
+
         return `
             <div class="text-center">
                 <h2 class="text-3xl font-bold text-secondary mb-4">#${rank}</h2>
                 <div class="bg-dark-card rounded-2xl shadow-lg p-6 text-center">
-                    <div class="flex justify-center mb-4">
+                    <div class="flex items-center justify-center gap-4 mb-4">
                         <div class="w-20 h-20 rounded-xl bg-slate-700 flex items-center justify-center p-2 flex-shrink-0">
-                            <img loading="lazy" alt="${tool.name[lang]}" src="${tool.logo}" class="max-h-full max-w-full object-contain"/>
+                            <img loading="lazy" alt="${tool.name[lang]}" src="${tool.logo}" class="max-h-full max-w-full object-contain" onerror="this.src='https://upload.wikimedia.org/wikipedia/commons/thumb/a/ac/No_image_available.svg/480px-No_image_available.svg.png'"/>
                         </div>
+                        <h3 class="text-2xl font-bold text-dark-text text-left flex-grow">${tool.name[lang]}</h3>
                     </div>
-                    <h3 class="text-2xl font-bold text-dark-text">${tool.name[lang]}</h3>
-                    <p class="text-gray-400 text-base leading-relaxed my-4 mx-auto max-w-md">${tool.short_description ? tool.short_description[lang] : ''}</p>
+                    <p class="text-gray-400 text-base leading-relaxed my-4 mx-auto max-w-md">${short_description}</p>
                     <div class="flex items-center justify-center gap-2 text-dark-text text-lg my-4">
                         <i class="fas fa-star text-yellow-400"></i>
                         <span class="font-bold">${tool.rating}</span>
@@ -118,8 +118,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // --- NAVIGATION & ROUTING ---
     const navigateTo = (page, categoryId = null) => { state.currentPage = page; state.currentCategory = categoryId; window.scrollTo(0, 0); updateURL(); render(); };
     const render = () => {
-        docElement.lang = state.language;
-        docElement.dir = state.language === 'ar' ? 'rtl' : 'ltr';
+        docElement.lang = state.language; docElement.dir = state.language === 'ar' ? 'rtl' : 'ltr';
         addGlobalEventListeners();
         if (state.currentPage === 'home') renderHomePage();
         else if (state.currentPage === 'categories') renderCategoriesPage();
